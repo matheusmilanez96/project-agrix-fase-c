@@ -42,6 +42,9 @@ public class FarmController {
 
   private final PersonService personService;
 
+  /**
+   * FarmController.
+   */
   @Autowired
   public FarmController(FarmService farmService, FertilizerService fertilizerService,
       PersonService personService) {
@@ -56,6 +59,9 @@ public class FarmController {
     return ResponseEntity.status(HttpStatus.CREATED).body(newFarm);
   }
 
+  /**
+   * Método createPerson.
+   */
   @PostMapping("/persons")
   public ResponseEntity<?> createPerson(@RequestBody PersonDto personDto) {
     Person newPerson = personService.create(personDto.toPerson());
