@@ -3,11 +3,14 @@ package com.betrybe.agrix.ebytr.staff.controllers;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.CropCreationDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.FarmDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.FertilizerDto;
+import com.betrybe.agrix.ebytr.staff.controllers.dto.PersonDto;
 import com.betrybe.agrix.ebytr.staff.entity.Crop;
 import com.betrybe.agrix.ebytr.staff.entity.Farm;
 import com.betrybe.agrix.ebytr.staff.entity.Fertilizer;
+import com.betrybe.agrix.ebytr.staff.entity.Person;
 import com.betrybe.agrix.ebytr.staff.service.FarmService;
 import com.betrybe.agrix.ebytr.staff.service.FertilizerService;
+import com.betrybe.agrix.ebytr.staff.service.PersonService;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -37,16 +40,30 @@ public class FarmController {
 
   private final FertilizerService fertilizerService;
 
+  private final PersonService personService;
+
   @Autowired
-  public FarmController(FarmService farmService, FertilizerService fertilizerService) {
+  public FarmController(FarmService farmService, FertilizerService fertilizerService,
+      PersonService personService) {
     this.farmService = farmService;
     this.fertilizerService = fertilizerService;
+    this.personService = personService;
   }
 
   @PostMapping("/farms")
   public ResponseEntity<Farm> createFarm(@RequestBody FarmDto farmDto) {
     Farm newFarm = farmService.insertFarm(farmDto.toFarm());
     return ResponseEntity.status(HttpStatus.CREATED).body(newFarm);
+  }
+
+  @PostMapping("/persons")
+  public ResponseEntity<?> createPerson(@RequestBody PersonDto personDto) {
+    Person newPerson = personService.create(personDto.toPerson());
+    Map<String, Object> finalMap = new HashMap<>();
+    finalMap.put("id", newPerson.getId());
+    finalMap.put("username", newPerson.getUsername());
+    finalMap.put("role", newPerson.getRole());
+    return ResponseEntity.status(HttpStatus.CREATED).body(finalMap);
   }
 
   @PostMapping("/fertilizers")
