@@ -5,13 +5,17 @@ import com.betrybe.agrix.ebytr.staff.exception.PersonNotFoundException;
 import com.betrybe.agrix.ebytr.staff.repository.PersonRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
  * Service layer class for handling persons business logic.
  */
 @Service
-public class PersonService {
+public class PersonService implements UserDetailsService {
 
   private final PersonRepository personRepository;
 
@@ -37,20 +41,18 @@ public class PersonService {
   /**
    * Returns a person for a given username.
    */
-  public Person getPersonByUsername(String username) {
-    Optional<Person> person = personRepository.findByUsername(username);
-
-    if (person.isEmpty()) {
-      throw new PersonNotFoundException();
-    }
-
-    return person.get();
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return personRepository.findByUsername(username);
   }
 
   /**
    * Creates a new person.
    */
   public Person create(Person person) {
+    String hashed = new BCryptPasswordEncoder()
+        .encode(person.getPassword());
+    person.setPassword(hashed);
     return personRepository.save(person);
   }
 }

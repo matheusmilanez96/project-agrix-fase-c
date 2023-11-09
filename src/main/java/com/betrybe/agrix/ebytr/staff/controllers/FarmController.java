@@ -1,9 +1,11 @@
 package com.betrybe.agrix.ebytr.staff.controllers;
 
+import com.betrybe.agrix.ebytr.staff.controllers.dto.AuthenticationDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.CropCreationDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.FarmDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.FertilizerDto;
 import com.betrybe.agrix.ebytr.staff.controllers.dto.PersonDto;
+import com.betrybe.agrix.ebytr.staff.controllers.dto.TokenDto;
 import com.betrybe.agrix.ebytr.staff.entity.Crop;
 import com.betrybe.agrix.ebytr.staff.entity.Farm;
 import com.betrybe.agrix.ebytr.staff.entity.Fertilizer;
@@ -11,6 +13,7 @@ import com.betrybe.agrix.ebytr.staff.entity.Person;
 import com.betrybe.agrix.ebytr.staff.service.FarmService;
 import com.betrybe.agrix.ebytr.staff.service.FertilizerService;
 import com.betrybe.agrix.ebytr.staff.service.PersonService;
+import com.betrybe.agrix.ebytr.staff.service.TokenService;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +23,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,15 +49,40 @@ public class FarmController {
 
   private final PersonService personService;
 
+  private final AuthenticationManager authenticationManager;
+
+  private final TokenService tokenService;
+
+
   /**
    * FarmController.
    */
   @Autowired
   public FarmController(FarmService farmService, FertilizerService fertilizerService,
-      PersonService personService) {
+      PersonService personService, AuthenticationManager authenticationManager,
+      TokenService tokenService) {
     this.farmService = farmService;
     this.fertilizerService = fertilizerService;
     this.personService = personService;
+    this.authenticationManager = authenticationManager;
+    this.tokenService = tokenService;
+  }
+
+  /**
+   * Método login.
+   */
+  @PostMapping("/auth/login")
+  public TokenDto login(@RequestBody AuthenticationDto authenticationDto) {
+
+    UsernamePasswordAuthenticationToken usernamePassword =
+        new UsernamePasswordAuthenticationToken(authenticationDto.username(),
+            authenticationDto.password());
+    Authentication auth = authenticationManager.authenticate(usernamePassword);
+    UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+    String token = tokenService.generateToken(userDetails);
+
+    return new TokenDto(token);
   }
 
   @PostMapping("/farms")
