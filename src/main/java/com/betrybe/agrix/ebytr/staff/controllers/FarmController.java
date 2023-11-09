@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -256,6 +257,7 @@ public class FarmController {
    * Método getAllCrops.
    */
   @GetMapping("/crops")
+  @Secured({"ROLE_MANAGER", "ROLE_ADMIN"})
   public List<?> getAllCrops() {
     List<Crop> allCrops = farmService.getAllCrops();
     return allCrops.stream()
@@ -268,6 +270,7 @@ public class FarmController {
    * Método getAllFarms.
    */
   @GetMapping("/farms")
+  @Secured({"ROLE_USER", "ROLE_MANAGER", "ROLE_ADMIN"})
   public List<FarmDto> getAllFarms() {
     List<Farm> allFarms = farmService.getAllFarms();
     return allFarms.stream()
@@ -279,6 +282,7 @@ public class FarmController {
    * Método getAllFertilizers.
    */
   @GetMapping("/fertilizers")
+  @Secured("ROLE_ADMIN")
   public List<FertilizerDto> getAllFertilizers() {
     List<Fertilizer> allFertilizers = fertilizerService.getAllFertilizers();
     return allFertilizers.stream()
