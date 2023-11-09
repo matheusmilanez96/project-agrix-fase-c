@@ -37,6 +37,9 @@ public class TokenService {
         .toInstant(ZoneOffset.of("-03:00"));
   }
 
+  /**
+   * Método validateToken.
+   */
   public String validateToken(String token) {
     Algorithm algorithm = Algorithm.HMAC256(secret);
     return JWT.require(algorithm)
